@@ -1,7 +1,8 @@
 # datalake-cloud-project
 
 # Architecture
-<img width="1127" alt="image" src="https://github.com/dinanazizi/datalake-cloud-project/assets/110298446/06fcd7b1-367e-41ae-a44c-3903d63daa30">
+<img width="1127" alt="image" src="https://github.com/dinanazizi/datalake-cloud-project/assets/110298446/2874ded3-9770-427e-b18c-b76ff02d5b8d">
+
 
 # Tech Stack
 
@@ -26,3 +27,22 @@ Nessie is a data versioning system similar to Git versioning.
 ## Metabase
 
 Metabase is a data analytics platform with capabilities to create graphs, perform data queries, and generate executive summaries.
+
+# STEPS
+
+1. Create folders and move the JAR file:
+- https://github.com/Baoqi/metabase-dremio-driver/releases/download/1.3.1/dremio.metabase-driver.jar
+2. Create a metabase folder inside the datalake folder.
+- Download the dremio.metabase-driver.jar file and move it to the metabase folder.
+3. Create a Dockerfile for Metabase:
+- Write a Dockerfile inside the metabase folder with the specified content.
+4. Set up Apache Airflow:
+- Create a dags folder inside the dl-airflow folder.
+- Write the Python code for the DAG.
+5. Create a Dockerfile for Airflow with the specified content.
+6. Write a docker-compose.yml file to set up the entire ecosystem.
+7. Create Docker networks:
+docker network create external_network
+docker network create iceberg_env
+8. Run the docker-compose.yml
+
