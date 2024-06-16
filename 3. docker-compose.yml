@@ -1,0 +1,102 @@
+version: "3.9"
+
+services:
+
+  # DREMIO
+  dl-dremio:
+    image: dremio/dremio-oss:latest
+    container_name: dl-dremio
+    ports:
+      - "9047:9047"  # Dremio UI port
+      - "31010:31010" # Dremio ODBC/JDBC port
+    volumes:
+      - ./dl-dremio-dir:/data  # Persist Dremio data
+    restart: always
+    networks:
+      - iceberg_env
+    platform: linux/amd64
+
+  # NESSIE
+  dl-nessie:
+    image: projectnessie/nessie
+    container_name: dl-nessie
+    ports:
+      - "19120:19120"
+    restart: always
+    volumes:
+      - ./dl-nessie-dir:/data
+    networks:
+      - iceberg_env
+    platform: linux/amd64
+
+  # MINIO SERVER
+  dl-minioserver:
+    image: minio/minio
+    container_name: dl-minioserver
+    ports:
+      - 9002:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    restart: always
+    volumes:
+      - ./dl-minio-dir:/data  # Persist Minio data
+    networks:
+      - iceberg_env
+    platform: linux/amd64
+
+  # METABASE
+  dl-metabase:
+    image: dl-metabase:latest
+    container_name: dl-metabase
+    ports:
+      - "3003:3000"
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
+    volumes:
+      - ./metabase-data:/metabase-data
+    networks:
+      - external_network
+      - iceberg_env
+    platform: linux/amd64
+
+  # POSTGRES - DATA MART EXECUTIVE SUMMARY
+  dl-dm-executive-summary:
+    image: postgres:latest
+    container_name: dl-dm-executive-summary
+    ports:
+      - "5481:5432"
+    environment:
+      POSTGRES_DB: db_executive_summary
+      POSTGRES_USER: usr_executive_summary
+      POSTGRES_PASSWORD: Admin123#
+    restart: always
+    volumes:
+      - ./dl-dm-executive-summary:/var/lib/postgresql/data  # Persist PostgreSQL data
+    networks:
+      - iceberg_env
+    platform: linux/amd64
+
+  # AIRFLOW
+  dl-airflow:
+    image: dl-airflow:latest
+    container_name: dl-airflow
+    volumes:
+      - ./dl-airflow-dir:/opt/airflow
+    restart: always
+    ports:
+      - "3001:8080"
+    command: airflow standalone
+    networks:
+      - iceberg_env
+    platform: linux/amd64
+
+networks:
+  external_network:
+    external: true
+  iceberg_env:
+    driver: bridge
+
+
